@@ -19,7 +19,7 @@ script:
   - sudo lxc launch images:alpine/3.5 alpine --profile piper-ci
   - sudo lxc image list
   # try network inside container
-  - sleep 1
+  - sleep 5
   - ifconfig
   - sudo lxc network list
   - sudo lxc exec alpine -- ifconfig
