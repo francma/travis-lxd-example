@@ -3,7 +3,7 @@ sudo: required
 language: generic
 
 script:
-  # install LXD
+  ########### LXC ###########
   - sudo add-apt-repository -y ppa:ubuntu-lxc/stable
   - sudo apt update
   - sudo apt-get install -y lxc lxd
@@ -25,3 +25,9 @@ script:
   - sudo lxc exec alpine -- ifconfig
   - sudo lxc exec alpine -- ping 8.8.8.8 -c 10
   - sudo lxc exec alpine -- ping google.cz -c 10
+  ########### LXD ###########
+  - sudo lxc config set core.https_address [::]
+  - openssl genrsa 2048 > client.key
+  - openssl req -new -x509 -nodes -sha1 -days 365 -key client.key -out client.crt -subj "/C=CZ/ST=Czech Republic/L=Prague/O=TEST/OU=IT Department/CN=ssl.raymii.org"
+  - sudo lxc config trust add client.crt
+  - curl -k -L --cert client.crt --key client.key "https://127.0.0.1:8443/1.0/images"
