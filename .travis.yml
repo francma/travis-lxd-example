@@ -1,0 +1,27 @@
+dist: trusty
+sudo: required
+language: generic
+
+script:
+  # install LXD
+  - sudo add-apt-repository -y ppa:ubuntu-lxc/stable
+  - sudo apt update
+  - sudo apt-get install -y lxc lxd
+  # create storage pool
+  - sudo lxc storage create pool1 dir
+  # create profile
+  - sudo lxc profile copy default piper-ci
+  - sudo lxc profile set piper-ci security.privileged true
+  - sudo lxc profile device add piper-ci eth0 nic nictype=bridged parent=lxcbr0 name=eth0
+  - sudo lxc profile device add piper-ci root disk pool=pool1 path=/
+  - sudo lxc profile show piper-ci
+  # launch image
+  - sudo lxc launch images:alpine/3.5 alpine --profile piper-ci
+  - sudo lxc image list
+  # try network inside container
+  - sleep 1
+  - ifconfig
+  - sudo lxc network list
+  - sudo lxc exec alpine -- ifconfig
+  - sudo lxc exec alpine -- ping 8.8.8.8 -c 10
+  - sudo lxc exec alpine -- ping google.cz -c 10
