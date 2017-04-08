@@ -30,4 +30,4 @@ script:
   - openssl genrsa 2048 > client.key
   - openssl req -new -x509 -nodes -sha1 -days 365 -key client.key -out client.crt -subj "/C=CZ/ST=Czech Republic/L=Prague/O=TEST/OU=IT Department/CN=ssl.raymii.org"
   - sudo lxc config trust add client.crt
-  - curl -k -L --cert ~/.config/lxc/client.crt --key ~/.config/lxc/client.key "https://127.0.0.1:8443/1.0/images"
+  - curl -k -L --cert client.crt --key client.key "https://127.0.0.1:8443/1.0/images"
