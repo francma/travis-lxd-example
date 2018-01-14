@@ -1,33 +1,31 @@
 dist: trusty
-sudo: required
+sudo: yes
 language: generic
 
 script:
-  ########### LXC ###########
-  - sudo add-apt-repository -y ppa:ubuntu-lxc/stable
-  - sudo apt update
-  - sudo apt-get install -y lxc lxd
-  # create storage pool
-  - sudo lxc storage create pool1 dir
+  # exit on fail
+  - set -eo pipefail
+  # setup LXD group
+  - sudo groupadd --system lxd
+  - sudo usermod -a -G lxd $USER
+  # install lxd
+  - sudo apt-get --yes install snapd
+  - sudo snap install lxd
   # create profile
-  - sudo lxc profile copy default piper-ci
-  - sudo lxc profile set piper-ci security.privileged true
-  - sudo lxc profile device add piper-ci eth0 nic nictype=bridged parent=lxcbr0 name=eth0
-  - sudo lxc profile device add piper-ci root disk pool=pool1 path=/
-  - sudo lxc profile show piper-ci
+  - sudo lxd waitready
+  - printf 'y\ndefault\ndir\ny\nall\n8443\n\n\ny\nlxdbr0\nauto\nauto\n' | sudo lxd init
+  - sudo lxd.lxc profile copy default travis
+  - sudo lxd.lxc profile set travis security.privileged true
   # launch image
-  - sudo lxc launch images:alpine/3.5 alpine --profile piper-ci
-  - sudo lxc image list
+  - sudo lxd.lxc launch images:alpine/3.5 alpine --profile travis
+  # mount current dir into container
+  - sudo lxd.lxc config device add alpine travis disk source="$PWD" path=/travis
+  - sudo lxd.lxc exec alpine -- ls -al /travis
   # try network inside container
   - sleep 5
-  - ifconfig
-  - sudo lxc network list
-  - sudo lxc exec alpine -- ifconfig
-  - sudo lxc exec alpine -- ping 8.8.8.8 -c 10
-  - sudo lxc exec alpine -- ping google.cz -c 10
-  ########### LXD ###########
-  - sudo lxc config set core.https_address [::]
+  - sudo lxd.lxc exec alpine -- ping github.com -c 2
+  # try LXD REST api
   - openssl genrsa 2048 > client.key
   - openssl req -new -x509 -nodes -sha1 -days 365 -key client.key -out client.crt -subj "/C=CZ/ST=Czech Republic/L=Prague/O=TEST/OU=IT Department/CN=ssl.raymii.org"
-  - sudo lxc config trust add client.crt
+  - sudo lxd.lxc config trust add client.crt
   - curl -k -L --cert client.crt --key client.key "https://127.0.0.1:8443/1.0/images"
