@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/francma/travis-lxc-example.svg?branch=master)](https://travis-ci.org/francma/travis-lxc-example)
 
-Just a example Travis CI build using LXD.
+Just an example Travis CI build using LXD.
 
 * Install LXD from [Snap](https://snapcraft.io/)
 * Setup networking
