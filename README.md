@@ -1,6 +1,6 @@
 # Travis LXD example
 
-[![Build Status](https://travis-ci.org/francma/travis-lxc-example.svg?branch=master)](https://travis-ci.org/francma/travis-lxc-example)
+[![Build Status](https://travis-ci.org/francma/travis-lxd-example.svg?branch=master)](https://travis-ci.org/francma/travis-lxd-example)
 
 Just an example Travis CI build using LXD.
 
