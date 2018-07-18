@@ -9,6 +9,7 @@ script:
   - sudo groupadd --system lxd
   - sudo usermod -a -G lxd $USER
   # install lxd
+  - sudo apt-get -qq update
   - sudo apt-get --yes install snapd
   - sudo snap install lxd
   # create profile
